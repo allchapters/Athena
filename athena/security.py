@@ -81,9 +81,13 @@ class Policy:
         if name == "bash":
             command = str(args.get("command", ""))
             for pattern in DENY_PATTERNS:
-                if re.search(pattern, command):
-                    return (f"the command matches a denied pattern ({pattern}) — "
-                            "destructive commands are refused in every mode")
+                hit = re.search(pattern, command)
+                if hit:
+                    # Quote what matched, not the pattern that caught it. The
+                    # model has to act on this sentence, and a raw regex tells it
+                    # nothing about which part of its command was the problem.
+                    return (f"{hit.group(0)!r} is a destructive command — "
+                            "refused in every mode, including yolo")
 
         # Reading is always allowed; yolo allows everything that survived above.
         if name in READ_TOOLS or self.mode == "yolo":
