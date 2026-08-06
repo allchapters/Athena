@@ -7,3 +7,6 @@ Athena-key.sh
 
 # Local scratch: course prompt files, not part of the reference implementation.
 DontUse-MyPromptFiles/
+
+# The demo sandbox. Whatever the agent builds in here is a transcript, not source.
+scratch/
