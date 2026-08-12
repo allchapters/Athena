@@ -60,7 +60,7 @@ FACT = ("This project deploys with `make ship`, never `make deploy` — "
 
 BRAND_VOICE = """---
 name: brand-voice
-description: The voice all user-facing text must be written in. Load before writing any prose, docs, or release notes.
+description: The voice all user-facing text uses. Load before writing any prose.
 ---
 
 # Brand voice
@@ -156,9 +156,13 @@ def converse(workdir, task, extra="", budget=None, kit=None, seen=None):
     between "answers from memory" and "obeys a skill" is not different code, it
     is different files on disk.
     """
-    kit = kit if kit is not None else tools.core_tools(str(workdir)) + memory_tools(str(workdir))
-    system = memory.build_system_prompt(str(workdir), extra=_join(
-        skills.catalog_prompt(str(workdir)), extra))
+    workdir = str(workdir)
+    if kit is None:
+        kit = tools.core_tools(workdir) + memory_tools(workdir)
+    # The catalogue goes in `extra` alongside the caller's own additions: skills
+    # are project state, and memory.py has no business knowing they exist.
+    system = memory.build_system_prompt(
+        workdir, extra=_join(skills.catalog_prompt(workdir), extra))
     print(f"\n[system prompt] {len(system)} chars, "
           f"~{len(system) // context.CHARS_PER_TOKEN} tokens")
     print(f"[tools] {', '.join(t.name for t in kit)}")
