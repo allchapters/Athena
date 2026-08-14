@@ -1,7 +1,7 @@
 """Athena — the smallest agent harness that still does the real things.
 
-Thirteen files, no dependencies. The package is the tour: read it in the order it
-was built and there is nothing left over.
+Ten files are the agent and four are how you reach it. No dependencies. The
+package is the tour: read it in the order it was built, and nothing is left over.
 
     provider.py   one boundary to the model, and Gemini's wire format behind it
     loop.py       think, act, observe, repeat — the agent is a loop

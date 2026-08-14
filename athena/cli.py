@@ -91,9 +91,14 @@ def _parse(argv):
 
 
 def _headless(harness, prompt) -> int:
-    """Run one task and print its answer. For scripts, cron, and CI."""
-    answer = harness.run(prompt)
-    print(f"\n{answer}")
+    """Run one task to completion. For scripts, cron, and CI.
+
+    The answer is not printed here, because it has already been printed: the
+    final turn is an assistant message like every other one, and _show gets it.
+    Printing the return value as well would put the agent's conclusion on screen
+    twice, and a caller who wants only that has stdout to read.
+    """
+    harness.run(prompt)
     return 0
 
 
@@ -124,7 +129,8 @@ def _interactive(harness, mode) -> int:
             return 0
 
         try:
-            print(f"\n{harness.run(task)}")
+            # The answer arrives through _show, like every other turn did.
+            harness.run(task)
         except KeyboardInterrupt:
             # Interrupting a run is normal and safe, and this is where that
             # promise is either kept or quietly broken. Every message up to now
@@ -152,15 +158,15 @@ def _show(kind, payload):
 def _approve(call, reason) -> bool:
     """Ask the human. Anything that is not a yes is a no.
 
-    This is the approver Policy calls in safe mode, and it is the only place in
-    Athena where a person is in the loop. `reason` is the policy's own summary of
-    the call; the line above it is this file's, and shows the same call the way
-    every other call in the transcript has been shown — so what is being approved
-    looks like what has already been happening.
+    This is the approver Policy calls in safe mode, and the only place in Athena
+    where a person is in the loop. The call is shown the way every other call in
+    the transcript has been shown, so what is being approved looks like what has
+    already been happening; `reason` is the policy's own summary of the same call
+    and would only say it twice.
     """
     print(f"\n{_call_line(call)}")
     try:
-        answer = input(f"  approve {reason} [y/N] ").strip().lower()
+        answer = input(f"  approve {call['name']}? [y/N] ").strip().lower()
     except (EOFError, KeyboardInterrupt):
         # No terminal, or the user pressed Ctrl-C rather than answer. Both are
         # refusals, and neither should take the process down.
