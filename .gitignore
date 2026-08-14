@@ -10,3 +10,6 @@ DontUse-MyPromptFiles/
 
 # The demo sandbox. Whatever the agent builds in here is a transcript, not source.
 scratch/
+
+# Session transcripts. The agent's own history of a directory, not the project's.
+.athena/
